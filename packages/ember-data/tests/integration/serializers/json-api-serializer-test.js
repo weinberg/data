@@ -186,6 +186,7 @@ test('Serializer should respect the attrs hash when serializing attributes and r
   equal(payload.data.relationships['company_relationship_key'].data.id, "1");
   equal(payload.data.attributes['title_attribute_key'], "director");
 });
+<<<<<<< HEAD
 
 test('Serializer should respect the attrs hash when serializing multi-word attributes and relationships', function() {
   env.registry.register("serializer:user", DS.JSONAPISerializer.extend({
@@ -243,8 +244,11 @@ test('Serializer should respect the attrs hash when extracting multi-word attrib
     }]
   };
 
+  debugger;
   var user = env.store.serializerFor("user").normalizeResponse(env.store, User, jsonHash, '1', 'findRecord');
 
   equal(user.data.attributes.firstName, "Yehuda");
 });
 
+=======
+>>>>>>> upstream/master
