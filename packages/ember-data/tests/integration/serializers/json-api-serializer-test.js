@@ -186,3 +186,30 @@ test('Serializer should respect the attrs hash when serializing attributes and r
   equal(payload.data.relationships['company_relationship_key'].data.id, "1");
   equal(payload.data.attributes['title_attribute_key'], "director");
 });
+
+test('Serializer should respect the attrs hash when serializing multi-word attributes and relationships', function() {
+  env.registry.register("serializer:user", DS.JSONAPISerializer.extend({
+    attrs: {
+      firstName: "first_name_key"
+    }
+  }));
+  var company, user;
+
+  run(function() {
+    env.store.push({
+      data: {
+        type: 'company',
+        id: '1',
+        attributes: {
+          name: "Tilde Inc."
+        }
+      }
+    });
+    company = env.store.peekRecord('company', 1);
+    user = env.store.createRecord('user', { first_name_key: "Yehuda", title: "director", company: company });
+  });
+
+  var payload = env.store.serializerFor("user").serialize(user._createSnapshot());
+
+  equal(payload.data.attributes['firstName'], "Yehuda");
+});
