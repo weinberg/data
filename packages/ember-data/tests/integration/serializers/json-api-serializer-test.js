@@ -206,10 +206,45 @@ test('Serializer should respect the attrs hash when serializing multi-word attri
       }
     });
     company = env.store.peekRecord('company', 1);
-    user = env.store.createRecord('user', { first_name_key: "Yehuda", title: "director", company: company });
+    user = env.store.createRecord('user', { firstName: "Yehuda", title: "director", company: company });
   });
 
   var payload = env.store.serializerFor("user").serialize(user._createSnapshot());
 
-  equal(payload.data.attributes['firstName'], "Yehuda");
+  equal(payload.data.attributes['first_name_key'], "Yehuda");
 });
+
+test('Serializer should respect the attrs hash when extracting multi-word attributes and relationships', function() {
+  env.registry.register("serializer:user", DS.JSONAPISerializer.extend({
+    attrs: {
+      firstName: "first_name_key"
+    }
+  }));
+
+  var jsonHash = {
+    data: {
+      type: 'users',
+      id: '1',
+      attributes: {
+        'first_name_key': 'Yehuda'
+      },
+      relationships: {
+        'company_relationship_key': {
+          data: { type: 'companies', id: '2' }
+        }
+      }
+    },
+    included: [{
+      type: 'companies',
+      id: '2',
+      attributes: {
+        name: 'Tilde Inc.'
+      }
+    }]
+  };
+
+  var user = env.store.serializerFor("user").normalizeResponse(env.store, User, jsonHash, '1', 'findRecord');
+
+  equal(user.data.attributes.firstName, "Yehuda");
+});
+
